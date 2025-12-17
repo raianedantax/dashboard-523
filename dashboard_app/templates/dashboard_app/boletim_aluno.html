@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Boletim</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* Estilos adicionais para o corpo da página */
+        body {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container my-4 my-md-5">
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-4 text-center">
+                <h1 class="card-title h2 fw-bold">Portal do Aluno</h1>
+                <p class="card-text text-muted">Consulte suas notas e faltas de forma rápida e fácil.</p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-4">
+                <form method="POST" class="row g-3 align-items-center">
+                    {% csrf_token %} <div class="col-md-4">
+                        <label for="matricula" class="form-label fw-semibold">Digite sua Matrícula:</label>
+                    </div>
+                    <div class="col-md">
+                        <input type="text" id="matricula" name="matricula" class="form-control form-control-lg"
+                            placeholder="Ex: 2024001" value="{{ request.POST.matricula }}" required>
+                    </div>
+                    <div class="col-md-auto">
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-search me-2"></i>Consultar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if erro %}
+        <div class="alert alert-danger shadow-sm" role="alert">
+            <h5 class="alert-heading fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Ocorreu um erro</h5>
+            {{ erro }}
+        </div>
+        {% endif %}
+
+        {% if aluno %}
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="d-flex flex-column flex-sm-row align-items-center border-bottom pb-4 mb-4">
+                    {% if aluno.foto %}
+                    <img src="{{ aluno.foto.url }}" alt="Foto de {{ aluno.nome }}"
+                        class="rounded-circle me-sm-4 mb-3 mb-sm-0"
+                        style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #dee2e6;">
+                    {% else %}
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-sm-4 mb-3 mb-sm-0 text-muted"
+                        style="width: 100px; height: 100px; border: 3px solid #dee2e6;">
+                        <i class="bi bi-person-fill" style="font-size: 3rem;"></i>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <h2 class="h4 fw-bold mb-0">{{ aluno.nome }}</h2>
+                        <p class="text-muted">Matrícula: {{ aluno.matricula }}</p>
+                    </div>
+                </div>
+
+                {% for ano, boletins_do_ano in boletins_por_ano.items %}
+                <div class="mb-5">
+                    <h3 class="h5 fw-bold mb-3">Boletim do Ano de {{ ano }}</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered">
+                            <thead class="table-light text-center align-middle">
+                                <tr>
+                                    <th scope="col" class="text-start">Disciplina</th>
+                                    <th scope="col">B1</th>
+                                    <th scope="col">B2</th>
+                                    <th scope="col">Rec. 1</th>
+                                    <th scope="col">B3</th>
+                                    <th scope="col">B4</th>
+                                    <th scope="col">Rec. 2</th>
+                                    <th scope="col">Rec. Final</th>
+                                    <th scope="col">Média Final</th>
+                                    <th scope="col">Faltas</th>
+                                    <th scope="col">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center align-middle">
+                                {% for b in boletins_do_ano %}
+                                <tr>
+                                    <td class="text-start">{{ b.disciplina.descricao }}</td>
+                                    <td>{{ b.bimestre1|default_if_none:"-" }}</td>
+                                    <td>{{ b.bimestre2|default_if_none:"-" }}</td>
+                                    <td>{{ b.recusem1|default_if_none:"-" }}</td>
+                                    <td>{{ b.bimestre3|default_if_none:"-" }}</td>
+                                    <td>{{ b.bimestre4|default_if_none:"-" }}</td>
+                                    <td>{{ b.recusem2|default_if_none:"-" }}</td>
+                                    <td>{{ b.recfinal|default_if_none:"-" }}</td>
+                                    <td class="fw-bold">{{ b.final|default_if_none:"-" }}</td>
+                                    <td>{{ b.faltas|default_if_none:"-" }}</td>
+                                    <td>
+                                        {{ b.status|default_if_none:"-" }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
+```eof

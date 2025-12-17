@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Página Inicial - Dashboard{% endblock %}
+
+{% block content %}
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold">Bem-vindo ao Dashboard</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">Selecione um curso abaixo para começar a explorar as estatísticas de turmas e alunos.</p>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+    {% for curso in cursos %}
+    <div class="col">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center d-flex flex-column">
+                <h5 class="card-title">{{ curso.descricao }}</h5>
+                <p class="card-text text-muted flex-grow-1">Explore os dados deste curso.</p>
+                <!-- Este link ainda não funciona, mas será o próximo passo -->
+                <a href="#" class="btn btn-primary mt-auto">
+                    Ver Turmas <i class="bi bi-arrow-right-circle-fill"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-warning">Nenhum curso encontrado no banco de dados.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
